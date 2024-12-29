@@ -1,0 +1,29 @@
+{
+  "name": "telegramplugin",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "scan": "node dist/src/checkForNewFiles.js",
+    "upload": "node dist/src/uploadFiles.js",
+    "start": "node dist/src/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@types/request": "^2.47.0",
+    "cli-progress": "^3.12.0",
+    "isomorphic-fetch": "^3.0.0",
+    "node-telegram-bot-api": "^0.66.0",
+    "sqlite3": "^5.1.7",
+    "telegram": "^2.26.16",
+    "tough-cookie": "^2.5.0",
+    "typescript": "^5.7.2"
+  },
+  "devDependencies": {
+    "@types/isomorphic-fetch": "^0.0.39",
+    "@types/node-telegram-bot-api": "^0.64.7"
+  }
+}
