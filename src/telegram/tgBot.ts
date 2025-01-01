@@ -18,23 +18,25 @@ interface SharedLinksResponse {
 }
 
 const extractBaseUrlAndToken = (url) => {
-  // Regular expression to validate the link format (with http or https)
-  const regex = /^(https?):\/\/([^\/]+):(\d+)\/share\/([^\/]+)$/;
-
-  // Test the URL against the regular expression
-  const match = url.match(regex);
-
-  if (match) {
-    // Extract the base URL and the token
-    const baseUrl = `${match[1]}://${match[2]}:${match[3]}`; // http or https, followed by the domain and port
-    const token = match[4]; // Token after /share/
-
-    return { baseUrl, token };
-  } else {
-    // Invalid URL format
-    throw new Error("Invalid URL format. Expected format: /share/*");
-  }
-};
+    // Regular expression to validate the link format (with optional port)
+    const regex = /^(https?):\/\/([^\/]+)(?::(\d+))?\/share\/([^\/]+)$/;
+  
+    // Test the URL against the regular expression
+    const match = url.match(regex);
+  
+    if (match) {
+      // Extract the base URL and the token
+      const baseUrl = match[3] 
+        ? `${match[1]}://${match[2]}:${match[3]}` // Include port if present
+        : `${match[1]}://${match[2]}`; // Omit port if not present
+      const token = match[4]; // Token after /share/
+  
+      return { baseUrl, token };
+    } else {
+      // Invalid URL format
+      throw new Error("Invalid URL format. Expected format: /share/*");
+    }
+  };
 
 // Function to fetch shared link data
 async function getSharedLinkData(
