@@ -6,7 +6,7 @@
     "build": "tsc",
     "scan": "node dist/src/checkForNewFiles.js",
     "upload": "node dist/src/uploadFiles.js",
-    "start": "tsc && pm2 dist/src/index.js"
+    "start": "tsc && pm2 start dist/src/index.js"
   },
   "keywords": [],
   "author": "",
