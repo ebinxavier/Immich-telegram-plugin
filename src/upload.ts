@@ -100,10 +100,9 @@ const main = async () => {
             if (record.mediaType === "image") {
               console.log("Moving image file to /tmp: " + record.path);
               await moveFile(
-                record.path,
+                fullPath,
                 "/tmp/immich-deleted-files/" + record.path
               );
-              console.log("Moved original image file to /tmp");
             }
           } catch (error) {
             console.log("Error:", error);
