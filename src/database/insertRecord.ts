@@ -5,12 +5,14 @@ import { DB_PATH } from "./migration";
  * Function to insert a row into the "files" table.
  * @param path - The unique path of the file.
  * @param messageId - The message ID associated with the file.
- * @param syncStatus - The synchronization status of the file.
+ * @param fileUploadStatus - The synchronization status of the file.
  */
 export function insertFileInfo(
   path: string,
+  mediaType: string,
   messageId: number,
-  syncStatus: boolean
+  fileUploadStatus: string,
+  fileProcessingStatus: string
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     // Open a database connection
@@ -22,23 +24,27 @@ export function insertFileInfo(
 
     // Insert query
     const query = `
-      INSERT INTO files (path, messageId, syncStatus)
-      VALUES (?, ?, ?);
+      INSERT INTO files (path, mediaType, messageId, fileUploadStatus, fileProcessingStatus)
+      VALUES (?, ?, ?, ?, ?);
     `;
 
     // Execute the query
-    db.run(query, [path, messageId, syncStatus], function (err) {
-      if (err) {
-        db.close(); // Ensure the database connection is closed on error
-        return reject(`Error inserting row: ${err.message}`);
-      }
-
-      db.close((closeErr) => {
-        if (closeErr) {
-          return reject(`Error closing database: ${closeErr.message}`);
+    db.run(
+      query,
+      [path, mediaType, messageId, fileUploadStatus, fileProcessingStatus],
+      function (err) {
+        if (err) {
+          db.close(); // Ensure the database connection is closed on error
+          return reject(`Error inserting row: ${err.message}`);
         }
-        resolve();
-      });
-    });
+
+        db.close((closeErr) => {
+          if (closeErr) {
+            return reject(`Error closing database: ${closeErr.message}`);
+          }
+          resolve();
+        });
+      }
+    );
   });
 }

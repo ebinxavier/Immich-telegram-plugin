@@ -18,6 +18,12 @@ Key Features:
 
 - Rename `sample.env` to `.env` and populate all Telegram related credentials
 - Set `BASE_DIR` to the Immich installation directory `/library/upload`
+- VIDEO_COMPRESSION_LEVEL = "ultra_small_no_audio" | "ultra_small" | "small" | "medium", default value: `ultra_small`
+  - Source video size: 223 MB
+  - `medium`: 6.8 MB
+  - `small`: 1.9 MB
+  - `ultra_small`: 434 KB
+  - `ultra_small_no_audio`: 247 KB
 
 ### Installation
 

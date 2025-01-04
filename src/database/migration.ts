@@ -2,6 +2,23 @@ import sqlite3 from "sqlite3";
 import fs from "fs";
 
 export const DB_PATH = "./data/syncInfo.db";
+export const FILE_UPLOAD_JOB = "fileUploadJob";
+export const VIDEO_COMPRESSION_JOB = "fileCompressionJob";
+export const SCANNING_FILES_JOB = "scanningFilesJob";
+
+// Status string constants
+export const STATUS_IN_PROGRESS = "INPROGRESS";
+export const STATUS_COMPLETED = "COMPLETED";
+export const STATUS_ERROR = "ERROR";
+export const STATUS_NOT_STARTED = "NOT_STARTED";
+
+export type JOB_STATUS = "INPROGRESS" | "COMPLETED" | "ERROR" | "NOT_STARTED";
+export type JOB_NAME =
+  | "fileUploadJob"
+  | "fileCompressionJob"
+  | "scanningFilesJob";
+export type FILE_STATUS_TYPE = "fileUploadStatus" | "fileProcessingStatus";
+
 const DB_HOME = "./data";
 
 const createDatabase = () => {
@@ -14,18 +31,21 @@ const createDatabase = () => {
         console.log("Connected to SQLite database.");
       }
     });
-    // Create the "files" table with "path" as the primary key
-    const createTable = () => {
+
+    const createFilesTable = () => {
       const query = `
       CREATE TABLE IF NOT EXISTS files (
-        path TEXT PRIMARY KEY,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        path STRING UNIQUE NOT NULL,
+        mediaType STRING,
         messageId INTEGER,
-        syncStatus BOOLEAN NOT NULL
+        fileUploadStatus STRING NOT NULL,
+        fileProcessingStatus STRING NOT NULL
       );
     `;
       db.run(query, (err) => {
         if (err) {
-          console.error("Error creating table:", err.message);
+          console.error("Error creating table files: ", err.message);
         } else {
           console.log(
             'Table "files" created successfully with "path" as the primary key.'
@@ -34,9 +54,50 @@ const createDatabase = () => {
       });
     };
 
+    const createJobStatusTable = () => {
+      const query = `
+        CREATE TABLE IF NOT EXISTS jobStatus (
+         id INTEGER PRIMARY KEY AUTOINCREMENT,
+         jobName STRING,
+         status STRING,
+         fileID INTEGER
+        );
+      `;
+      db.run(query, (err) => {
+        if (err) {
+          console.error("Error creating table jobStatus: ", err.message);
+        } else {
+          console.log(
+            'Table "jobStatus" created successfully with "id" as the primary key.'
+          );
+        }
+      });
+
+      // SQL to insert rows into jobStatus table
+      const insertRowQuery = `
+    INSERT INTO jobStatus (jobName, status) VALUES (?, ?);
+    `;
+
+      // Insert rows
+      const jobs = [
+        [FILE_UPLOAD_JOB, STATUS_NOT_STARTED],
+        [VIDEO_COMPRESSION_JOB, STATUS_NOT_STARTED],
+        [SCANNING_FILES_JOB, STATUS_NOT_STARTED],
+      ];
+
+      jobs.forEach((job) => {
+        db.run(insertRowQuery, job, function (err) {
+          if (err) {
+            console.error("Error inserting row:", err.message);
+          }
+        });
+      });
+    };
+
     // Example usage
     db.serialize(() => {
-      createTable(); // Create the table
+      createFilesTable(); // Create the table
+      createJobStatusTable();
     });
 
     // Close the database connection
