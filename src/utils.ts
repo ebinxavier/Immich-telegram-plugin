@@ -82,25 +82,40 @@ export const handleDownloadLink = async (link: string): Promise<Asset[]> => {
 };
 
 export async function moveFile(source, target) {
-  try {
-    // Resolve absolute paths for source and target
-    const resolvedSource = path.resolve(source);
-    const resolvedTargetDir = path.resolve(target);
-
-    // Extract the filename from the source path
-    const fileName = path.basename(resolvedSource);
-
-    // Construct the full target file path
-    const targetFilePath = path.join(resolvedTargetDir, fileName);
-
-    // Ensure the target directory exists
-    await fs.mkdir(resolvedTargetDir, { recursive: true });
-
-    // Move the file
-    await fs.rename(resolvedSource, targetFilePath);
-
-    console.log(`File moved successfully to: ${targetFilePath}`);
-  } catch (err) {
-    console.error("Error while moving file:", err);
+    try {
+      // Resolve absolute paths for source and target
+      const resolvedSource = path.resolve(source);
+      const resolvedTargetDir = path.resolve(target);
+  
+      // Extract the filename from the source path
+      const fileName = path.basename(resolvedSource);
+  
+      // Construct the full target file path
+      const targetFilePath = path.join(resolvedTargetDir, fileName);
+  
+      // Ensure the target directory exists
+      await fs.mkdir(resolvedTargetDir, { recursive: true });
+  
+      try {
+        // Attempt to move the file
+        await fs.rename(resolvedSource, targetFilePath);
+        console.log(`File moved successfully to: ${targetFilePath}`);
+      } catch (err) {
+        if (err.code === "EXDEV") {
+          console.warn("Cross-device move detected, falling back to copy and delete.");
+  
+          // Copy the file
+          await fs.copyFile(resolvedSource, targetFilePath);
+  
+          // Delete the source file
+          await fs.unlink(resolvedSource);
+  
+          console.log(`File copied and source deleted successfully to: ${targetFilePath}`);
+        } else {
+          throw err; // Re-throw other errors
+        }
+      }
+    } catch (err) {
+      console.error("Error while moving file:", err);
+    }
   }
-}
