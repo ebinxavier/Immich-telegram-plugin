@@ -24,8 +24,8 @@ export function insertFileInfo(
 
     // Insert query
     const query = `
-      INSERT INTO files (path, mediaType, messageId, fileUploadStatus, fileProcessingStatus)
-      VALUES (?, ?, ?, ?, ?);
+      INSERT INTO files (path, mediaType, messageId, fileUploadStatus, fileProcessingStatus, foundAt)
+      VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP);
     `;
 
     // Execute the query

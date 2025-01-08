@@ -38,7 +38,7 @@ export const getNextRecordsWithFileUploadStatusFalse = (
 
     const query = `
       SELECT * FROM files
-      WHERE fileUploadStatus = '${STATUS_NOT_STARTED}'
+      WHERE fileUploadStatus = '${STATUS_NOT_STARTED}' AND foundAt < DATETIME(CURRENT_TIMESTAMP, '-1 day')
       LIMIT ${limit};
     `;
 

@@ -40,7 +40,8 @@ const createDatabase = () => {
         mediaType STRING,
         messageId INTEGER,
         fileUploadStatus STRING NOT NULL,
-        fileProcessingStatus STRING NOT NULL
+        fileProcessingStatus STRING NOT NULL,
+        foundAt TIMESTAMP
       );
     `;
       db.run(query, (err) => {

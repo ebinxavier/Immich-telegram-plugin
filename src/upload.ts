@@ -64,7 +64,7 @@ const main = async () => {
         const records = await getNextRecordsWithFileUploadStatusFalse(limit);
 
         if (!records.length) {
-          console.log("All files are in synced state!");
+          console.log("No files are available to be uploaded, file age should be greater than 1 day.");
           process.exit(0);
         }
 
