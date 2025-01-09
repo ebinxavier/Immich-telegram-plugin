@@ -61,7 +61,7 @@ const insertAllFilesFromDirectory = async (dirPath: string): Promise<void> => {
     const fullPath = path.join(dirPath, file);
     const relativePath = fullPath.split(process.env.BASE_DIR)[1];
     // Skip hidden files (those starting with a dot)
-    if (file.startsWith(".")) {
+    if (file.startsWith(".") || file.endsWith(".compressed.mp4")) {
       continue;
     }
     const stat = fs.statSync(fullPath);
