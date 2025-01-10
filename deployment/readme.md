@@ -37,3 +37,19 @@ e952d4b8d256   tensorchord/pgvecto-rs:pg14-v0.2.0                   "docker-entr
 75ab2a1986d0   redis:6.2-alpine                                     "docker-entrypoint.s…"   10 minutes ago   Up 10 minutes (healthy)   6379/tcp                                    immich_redis
 
 ```
+
+
+### Restore postgres DB
+
+docker compose down -v  # CAUTION! Deletes all Immich data to start from scratch
+## Uncomment the next line and replace DB_DATA_LOCATION with your Postgres path to permanently reset the Postgres database
+# rm -rf DB_DATA_LOCATION # CAUTION! Deletes all Immich data to start from scratch
+docker compose pull             # Update to latest version of Immich (if desired)
+docker compose create           # Create Docker containers for Immich apps without running them
+docker start immich_postgres    # Start Postgres server
+sleep 10                        # Wait for Postgres server to start up
+# Check the database user if you deviated from the default
+gunzip < "/home/opc/immich-server/library/backups/immich-db-backup-1736301600032.sql.gz" \
+| sed "s/SELECT pg_catalog.set_config('search_path', '', false);/SELECT pg_catalog.set_config('search_path', 'public, pg_catalog', true);/g" \
+| docker exec -i immich_postgres psql --username=postgres  # Restore Backup
+docker compose up -d            # Start remainder of Immich apps
