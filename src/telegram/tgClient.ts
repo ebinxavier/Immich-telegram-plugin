@@ -38,10 +38,10 @@ export const getClient = async () => {
     onError: (err) => console.log(err),
   });
 
-  // Uncomment the following to get Telegram Session Token
-  //   const sessionString = client.session.save();
-  //   console.log("Your session string is:", sessionString); // Save the session string
-  //   fs.writeFileSync("telegramToken.txt", sessionString as any, "utf8");
+//   Uncomment the following to get Telegram Session Token
+    const sessionString = client.session.save();
+    console.log("Your session string is:", sessionString); // Save the session string
+    fs.writeFileSync("telegramToken.txt", sessionString as any, "utf8");
 
   return client;
 };
