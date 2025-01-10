@@ -1,4 +1,5 @@
 import { TelegramClient } from "telegram";
+import fs from "fs";
 import { StringSession } from "telegram/sessions";
 import readline from "readline";
 import { LogLevel } from "telegram/extensions/Logger";
@@ -36,6 +37,12 @@ export const getClient = async () => {
       ),
     onError: (err) => console.log(err),
   });
+
+  // Uncomment the following to get Telegram Session Token
+  //   const sessionString = client.session.save();
+  //   console.log("Your session string is:", sessionString); // Save the session string
+  //   fs.writeFileSync("telegramToken.txt", sessionString as any, "utf8");
+
   return client;
 };
 
