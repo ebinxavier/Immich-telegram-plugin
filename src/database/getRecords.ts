@@ -39,6 +39,7 @@ export const getNextRecordsWithFileUploadStatusFalse = (
     const query = `
       SELECT * FROM files
       WHERE fileUploadStatus = '${STATUS_NOT_STARTED}' AND foundAt < DATETIME(CURRENT_TIMESTAMP, '-1 day')
+      ORDER BY foundAt ASC
       LIMIT ${limit};
     `;
 
@@ -47,6 +48,8 @@ export const getNextRecordsWithFileUploadStatusFalse = (
       if (err) {
         return reject(`Error fetching records: ${err.message}`);
       }
+
+      console.log({ rows });
       resolve(rows as FileRecord[]); // Resolves with the fetched rows
     });
   });
