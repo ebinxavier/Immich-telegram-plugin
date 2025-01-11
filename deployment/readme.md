@@ -38,18 +38,27 @@ e952d4b8d256   tensorchord/pgvecto-rs:pg14-v0.2.0                   "docker-entr
 
 ```
 
-
 ### Restore postgres DB
 
-docker compose down -v  # CAUTION! Deletes all Immich data to start from scratch
+docker compose down -v # CAUTION! Deletes all Immich data to start from scratch
+
 ## Uncomment the next line and replace DB_DATA_LOCATION with your Postgres path to permanently reset the Postgres database
+
 # rm -rf DB_DATA_LOCATION # CAUTION! Deletes all Immich data to start from scratch
-docker compose pull             # Update to latest version of Immich (if desired)
-docker compose create           # Create Docker containers for Immich apps without running them
-docker start immich_postgres    # Start Postgres server
-sleep 10                        # Wait for Postgres server to start up
+
+docker compose pull # Update to latest version of Immich (if desired)
+docker compose create # Create Docker containers for Immich apps without running them
+docker start immich_postgres # Start Postgres server
+sleep 10 # Wait for Postgres server to start up
+
 # Check the database user if you deviated from the default
+
 gunzip < "/home/opc/immich-server/library/backups/immich-db-backup-1736301600032.sql.gz" \
 | sed "s/SELECT pg_catalog.set_config('search_path', '', false);/SELECT pg_catalog.set_config('search_path', 'public, pg_catalog', true);/g" \
-| docker exec -i immich_postgres psql --username=postgres  # Restore Backup
-docker compose up -d            # Start remainder of Immich apps
+| docker exec -i immich_postgres psql --username=postgres # Restore Backup
+docker compose up -d # Start remainder of Immich apps
+
+### Import Immich config
+
+- Under administrator settings import this [immich config](./immich-config.json)
+- This config ensures that the image thumbnail is smaller and disable video transcoding.
