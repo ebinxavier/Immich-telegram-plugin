@@ -64,18 +64,20 @@ const main = async () => {
         const records = await getNextRecordsWithFileUploadStatusFalse(limit);
 
         if (!records.length) {
-          console.log("No files are available to be uploaded, file age should be greater than 1 day.");
+          console.warn(
+            "No files are available to be uploaded, file age should be greater than 1 day."
+          );
           process.exit(0);
         }
 
         for (let record of records) {
-          const fullPath = getFullPathFromImmichOriginalPath(record.path);
-          const fileSize = await getFileSizeInMB(fullPath);
-          console.log("Uploading filename: " + record.path);
-          console.log("Uploading file size: " + fileSize.toFixed(2) + " MB");
-          totalFileSize += fileSize;
-          progressBar.start(100, 0);
           try {
+            const fullPath = getFullPathFromImmichOriginalPath(record.path);
+            console.log("Uploading filename: " + fullPath);
+            const fileSize = await getFileSizeInMB(fullPath);
+            console.log("Uploading file size: " + fileSize.toFixed(2) + " MB");
+            totalFileSize += fileSize;
+            progressBar.start(100, 0);
             await updateFileStatus(
               record.path,
               "fileUploadStatus",
@@ -104,8 +106,11 @@ const main = async () => {
                 "/tmp/immich-deleted-files/" + record.path
               );
             }
+            progressBar.stop();
+            filesUploaded.push(record.path);
+            console.log("Uploaded successfully.\n");
           } catch (error) {
-            console.log("Error:", error);
+            console.error("Error:", error);
             await updateFileStatus(
               record.path,
               "fileUploadStatus",
@@ -114,11 +119,8 @@ const main = async () => {
           } finally {
             await updateJobStatus(FILE_UPLOAD_JOB, STATUS_NOT_STARTED);
           }
-          progressBar.stop();
-          filesUploaded.push(record.path);
-          console.log("Uploaded successfully.\n");
           if (totalFileSize >= uploadLimitMB) {
-            console.log("Upload limit exceeded!");
+            console.warn("Upload limit exceeded!");
             break; // Limit exceeded per run, next files will be uploaded in next run.
           }
         }

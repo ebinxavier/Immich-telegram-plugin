@@ -48,8 +48,6 @@ export const getNextRecordsWithFileUploadStatusFalse = (
       if (err) {
         return reject(`Error fetching records: ${err.message}`);
       }
-
-      console.log({ rows });
       resolve(rows as FileRecord[]); // Resolves with the fetched rows
     });
   });
