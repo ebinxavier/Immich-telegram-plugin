@@ -7,7 +7,8 @@
     "scan": "node dist/src/scan.js",
     "upload": "node dist/src/upload.js",
     "compress": "node dist/src/compress.js",
-    "start": "tsc && pm2 start dist/src/index.js --name immich-tg-bot"
+    "start": "tsc && pm2 start dist/src/index.js --name immich-tg-bot",
+    "dev": "tsc && node dist/src/index.js"
   },
   "keywords": [],
   "author": "",

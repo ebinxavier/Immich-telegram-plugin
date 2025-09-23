@@ -51,7 +51,7 @@ export const initializeBot = async () => {
 
       //   if (assets) bot.sendMessage(chatId, JSON.stringify({ assets }));
     } catch (e) {
-      console.log("Invalid URL");
+      console.log("Invalid URL", e);
       bot.sendMessage(
         chatId,
         "Invalid URL, share a proper URL from Immich application!"

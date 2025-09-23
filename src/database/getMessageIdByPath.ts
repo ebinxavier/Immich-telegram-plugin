@@ -7,6 +7,8 @@ import { DB_PATH } from "./migration";
  * @returns A promise that resolves to the messageId if found, or rejects if not found.
  */
 export const getMessageIdByPath = (filePath: string): Promise<number> => {
+  // Sometime path prefix will be added in the request, path should always starts with upload/upload/UUID
+  filePath = filePath.replace(/^.*upload\/upload\//, "upload/upload/");
   return new Promise((resolve, reject) => {
     const db = new sqlite3.Database(DB_PATH, (err) => {
       if (err) {
@@ -17,7 +19,7 @@ export const getMessageIdByPath = (filePath: string): Promise<number> => {
     const query = `
       SELECT messageId
       FROM files
-      WHERE path = ?;
+      WHERE path LIKE '%' || ?;
     `;
 
     db.get(query, [filePath], (err, row: any) => {
