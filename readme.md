@@ -2,7 +2,7 @@
 
 This plugin is designed to work with the Immich photos application. It allows you to store original media files in a Telegram group that you create, helping you free up significant storage space on your server.
 
-Immich typically uses cached, smaller-sized images to load content in the app. By integrating this plugin, you can delete the original images from your server, leaving only the smaller cached versions. When you need access to the original, high-quality images, you can generate a shared link directly from the Immich app and send it to the Telegram group where the bot is running. The bot will search for the original images and send them back on demand.
+Immich typically uses cached, smaller-sized images to load content in the app. By integrating this plugin, you can move the original images from your server to telegram storage, leaving only the smaller cached versions. When you need access to the original, high-quality images, you can generate a shared link directly from the Immich app and send it to the Telegram group where the bot is running. The bot will search for the original images and send them back on demand.
 
 Key Features:
 
