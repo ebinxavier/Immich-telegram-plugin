@@ -6,6 +6,8 @@ import {
   JOB_NAME,
   JOB_STATUS,
   STATUS_COMPLETED,
+  STATUS_IN_PROGRESS,
+  STATUS_NOT_STARTED,
 } from "./migration";
 /**
  * Function to update fileUploadStatus and messageId for a given path.
@@ -132,3 +134,31 @@ export const updateJobStatus = (
     });
   });
 };
+/**
+ * Recovers from a crashed upload run: files stuck in INPROGRESS are made eligible again.
+ * Must only be called while holding the upload lock.
+ */
+export const resetStaleUploads = (): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    const db = new sqlite3.Database(DB_PATH, (err) => {
+      if (err) {
+        return reject(`Error opening database: ${err.message}`);
+      }
+    });
+
+    db.serialize(() => {
+      db.run(
+        `UPDATE files SET fileUploadStatus = '${STATUS_NOT_STARTED}' WHERE fileUploadStatus = '${STATUS_IN_PROGRESS}'`
+      );
+      db.run(
+        `UPDATE jobStatus SET status = '${STATUS_NOT_STARTED}', fileID = NULL WHERE jobName = '${FILE_UPLOAD_JOB}'`,
+        (err) => {
+          db.close();
+          if (err) return reject(`Error resetting stale upload: ${err.message}`);
+          resolve();
+        }
+      );
+    });
+  });
+};
+

@@ -25,10 +25,12 @@ import {
 import { uploadMedia } from "./telegram/tgClient";
 import {
   insertTelegramMessageId,
+  resetStaleUploads,
   updateFileStatus,
   updateJobStatus,
 } from "./database/updateRecord";
 import { getFullPathFromImmichOriginalPath, moveFile } from "./utils";
+import { acquireLock } from "./lock";
 
 const getFileSizeInMB = (filePath: string): Promise<number> => {
   return new Promise((resolve, reject) => {
@@ -46,10 +48,23 @@ const getFileSizeInMB = (filePath: string): Promise<number> => {
 
 const main = async () => {
   try {
-    // Check whether upload job in progress
+    // A PID lock file tells whether another upload run is really alive. The DB job status
+    // alone can stay INPROGRESS forever if a run is killed, blocking every later run.
+    if (!acquireLock("./data/upload.lock")) {
+      console.error("Another upload job in progress, try again later.");
+      return;
+    }
+    // Watchdog: a hung Telegram connection must not block all future cron runs.
+    // process.exit fires the "exit" handler, which releases the lock; the next run resets stale DB state.
+    const timeoutMinutes = Number(process.env.UPLOAD_TIMEOUT_IN_MINUTES) || 120;
+    setTimeout(() => {
+      console.error(`Upload run exceeded ${timeoutMinutes} minutes, aborting.`);
+      process.exit(1);
+    }, timeoutMinutes * 60 * 1000).unref();
+    await migration();
+    await resetStaleUploads();
     const jobStatus = await getJobStatus(FILE_UPLOAD_JOB);
     if (jobStatus.status === STATUS_NOT_STARTED) {
-      await migration();
       let totalFileSize = 0;
       let filesUploaded = [];
       const uploadLimitMB =
