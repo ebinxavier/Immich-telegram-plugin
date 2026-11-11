@@ -39,14 +39,22 @@ export const initializeBot = async () => {
         "Original files found: " + messageIds.length + "/" + assets.length
       );
 
-      for (let messageId of messageIds) {
-        const client = await getClient();
-        const messages = await client.getMessages(process.env.TG_CHANNEL_ID, {
-          ids: messageId,
-        });
-        await client.sendMessage(process.env.TG_CHANNEL_ID, {
-          message: messages[0],
-        });
+      try {
+        for (let messageId of messageIds) {
+          const client = await getClient();
+          const messages = await client.getMessages(process.env.TG_CHANNEL_ID, {
+            ids: messageId,
+          });
+          await client.sendMessage(process.env.TG_CHANNEL_ID, {
+            message: messages[0],
+          });
+        }
+      } catch (e) {
+        console.error("Error while sending original files:", e);
+        bot.sendMessage(
+          chatId,
+          "Failed to send original files from Telegram: " + (e?.errorMessage || e?.message || e)
+        );
       }
 
       //   if (assets) bot.sendMessage(chatId, JSON.stringify({ assets }));

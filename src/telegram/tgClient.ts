@@ -9,11 +9,11 @@ const rl = readline.createInterface({
   output: process.stdout,
 });
 
-export const getClient = async () => {
-  let client: TelegramClient;
+let client: TelegramClient;
+export const getClient = async (session = process.env.TG_SESSION) => {
   if (client) return client;
   client = new TelegramClient(
-    new StringSession(process.env.TG_SESSION),
+    new StringSession(session),
     Number(process.env.TG_APP_ID),
     process.env.TG_API_HASH,
     {
@@ -52,7 +52,11 @@ export const uploadMedia = (
 ): Promise<any> => {
   return new Promise(async (resolve, reject) => {
     try {
-      const client = await getClient();
+      // Telegram rejects one session used by two processes at once (AUTH_KEY_DUPLICATED),
+      // so the upload job (cron) uses a separate session from the bot (pm2).
+      const client = await getClient(
+        process.env.TG_UPLOAD_SESSION || process.env.TG_SESSION
+      );
       const result = await client.sendFile(process.env.TG_CHANNEL_ID, {
         file: imgSrc,
         forceDocument: true,
