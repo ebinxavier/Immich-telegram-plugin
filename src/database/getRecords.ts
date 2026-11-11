@@ -38,7 +38,7 @@ export const getNextRecordsWithFileUploadStatusFalse = (
 
     const query = `
       SELECT * FROM files
-      WHERE fileUploadStatus = '${STATUS_NOT_STARTED}' AND foundAt < DATETIME(CURRENT_TIMESTAMP, '-1 day')
+      WHERE fileUploadStatus = '${STATUS_NOT_STARTED}' AND messageId IS NULL AND foundAt < DATETIME(CURRENT_TIMESTAMP, '-1 day')
       ORDER BY foundAt ASC
       LIMIT ${limit};
     `;
